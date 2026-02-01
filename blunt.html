@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>BluntTruth AI</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: radial-gradient(circle at top, #1b1b1b, #0e0e0e);
+    color: #eaeaea;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 40px;
+  }
+
+  h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+    color: #ff5555;
+  }
+
+  h2 {
+    font-weight: normal;
+    color: #aaa;
+    margin-bottom: 30px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: #151515;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    resize: none;
+  }
+
+  button {
+    background: linear-gradient(135deg, #ff4b4b, #ff7676);
+    border: none;
+    color: black;
+    font-size: 16px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+    font-weight: bold;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .card {
+    background: #161616;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a2a2a;
+  }
+
+  .card h3 {
+    margin-top: 0;
+    color: #ff7777;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #222;
+    border: 1px solid #444;
+    margin-right: 8px;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .score {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ff5555;
+  }
+
+  .debate-round {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: #111;
+    border-left: 4px solid #ff5555;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    color: #777;
+    font-size: 13px;
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>🔥 BluntTruth AI</h1>
+  <h2>Enter an opinion. Watch it get tested.</h2>
+
+  <textarea id="inputText" placeholder="Example: College degrees are useless because successful people drop out."></textarea>
+
+  <br>
+  <button onclick="analyze()">Analyze Opinion</button>
+  <button onclick="debate()">Debate Mode</button>
+
+  <div id="results"></div>
+
+  <footer>
+    BluntTruth AI — Offline Critical Reasoning Engine
+  </footer>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+async function analyze() {
+  const text = document.getElementById("inputText").value;
+  if (!text.trim()) return;
+
+  const res = await fetch(`${API}/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    document.getElementById("results").innerHTML =
+      `<div class="card"><h3>Error</h3>${data.error}</div>`;
+    return;
+  }
+
+  document.getElementById("results").innerHTML = `
+    <div class="grid">
+
+      <div class="card">
+        <h3>Confidence Score</h3>
+        <div class="score">${data.confidence_score}/100</div>
+      </div>
+
+      <div class="card">
+        <h3>Detected Fallacies</h3>
+        ${data.detected_fallacies.map(f => `<span class="badge">${f}</span>`).join("")}
+      </div>
+
+      <div class="card">
+        <h3>Blunt Counter-Argument</h3>
+        <p>${data.counter_argument.replace(/\n/g, "<br>")}</p>
+      </div>
+
+      <div class="card">
+        <h3>Steelman Argument</h3>
+        <p>${data.steelman_argument.replace(/\n/g, "<br>")}</p>
+      </div>
+
+      <div class="card">
+        <h3>Final Verdict</h3>
+        <p>${data.final_verdict}</p>
+      </div>
+
+    </div>
+  `;
+}
+
+async function debate() {
+  const text = document.getElementById("inputText").value;
+  if (!text.trim()) return;
+
+  const res = await fetch(`${API}/debate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("results").innerHTML = `
+    <div class="card">
+      <h3>Debate Mode</h3>
+      ${data.debate.map(d => `
+        <div class="debate-round">
+          <strong>Round ${d.round}</strong><br>
+          ${d.response.replace(/\n/g, "<br>")}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>

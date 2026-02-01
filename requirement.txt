@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+openai
+transformers
+torch
+sentence-transformers
+scikit-learn
+numpy

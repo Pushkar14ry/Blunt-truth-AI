@@ -1,2 +1,11 @@
 # Blunt-truth-AI
 A AI chat box which argues with logic.
+BluntTruth AI can be used by first starting the backend server from the project directory with the command `uvicorn main:app --reload`. Once the server is running, the API becomes available locally at `http://127.0.0.1:8000`, and interactive documentation can be accessed through Swagger at `http://127.0.0.1:8000/docs`. The system exposes two main endpoints: one for analyzing opinions and another for running debate simulations.
+
+For the recommended experience, users can interact with BluntTruth AI through the provided web interface. By simply opening the `index.html` file in a browser, users can enter an opinion into the input field and trigger analysis without any additional setup. Clicking **Analyze Opinion** generates a confidence score, identifies logical fallacies, produces a blunt counter-argument, constructs a steelman defense, and returns a final logical verdict. Clicking **Debate Mode** initiates multiple rounds of reasoning that demonstrate how the argument evolves under continued scrutiny.
+
+BluntTruth AI can also be used directly through its REST API. Sending a POST request to the `/analyze` endpoint with a JSON body containing a single `text` field will return a structured evaluation of the opinion. A separate POST request to the `/debate` endpoint with the same input will generate a multi-round debate. The system is designed to reject factual statements and only process opinions, ensuring meaningful analysis.
+
+For demonstrations or recordings, a reliable example prompt is “College degrees are useless because some of the richest people dropped out of university.” This input consistently activates all core features of the system, including fallacy detection, adversarial reasoning, confidence scoring, and debate mode. Because BluntTruth AI runs fully offline, no API keys or internet connection are required after setup, making it ideal for live demos, hackathons, and restricted environments.
+
+In summary, BluntTruth AI is intended to be a critical-thinking tool rather than a conversational assistant. Its usage workflow is simple—start the server, provide an opinion, and observe how the system challenges, defends, debates, and scores the idea—forcing arguments to withstand logical scrutiny instead of emotional agreement.
